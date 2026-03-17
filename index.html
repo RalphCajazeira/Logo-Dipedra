@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor de Logo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel controls">
+        <div class="panel-header">
+          <h2>Editor de Logo</h2>
+          <p>Edite textos, fundo, fontes e exportação em um só lugar.</p>
+        </div>
+
+        <div class="controls-sections">
+          <section class="control-section">
+            <h3>Conteúdo</h3>
+            <div class="grid cols-1">
+              <label>
+                Texto principal
+                <input id="mainText" type="text" value="DIPEDRA" />
+              </label>
+
+              <label>
+                Texto secundário
+                <input
+                  id="secondaryText"
+                  type="text"
+                  value="Rochas Ornamentais"
+                />
+              </label>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>Texto principal</h3>
+            <div class="grid">
+              <label>
+                Fonte pronta
+                <select id="mainFont">
+                  <option value="stopregular">stopregular</option>
+                  <option value="BeckerGothics-Stencil">
+                    BeckerGothics-Stencil
+                  </option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="Tahoma, sans-serif">Tahoma</option>
+                  <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+              </label>
+
+              <label>
+                Nome de fonte instalada
+                <input
+                  id="mainCustomFontName"
+                  type="text"
+                  placeholder="Ex: Montserrat, Gotham, MinhaFonte"
+                />
+              </label>
+
+              <label>
+                Arquivo de fonte personalizado
+                <input
+                  id="mainFontFile"
+                  type="file"
+                  accept=".ttf,.otf,.woff,.woff2"
+                />
+              </label>
+
+              <label>
+                Cor
+                <input id="mainColor" type="color" value="#ffffff" />
+              </label>
+
+              <label>
+                Tamanho da fonte (px)
+                <input
+                  id="mainSize"
+                  type="number"
+                  min="10"
+                  max="1200"
+                  value="250"
+                />
+              </label>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>Texto secundário</h3>
+            <div class="grid">
+              <label>
+                Fonte pronta
+                <select id="secondaryFont">
+                  <option value="BeckerGothics-Stencil">
+                    BeckerGothics-Stencil
+                  </option>
+                  <option value="stopregular">stopregular</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="Tahoma, sans-serif">Tahoma</option>
+                  <option value="Trebuchet MS, sans-serif">Trebuchet MS</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+              </label>
+
+              <label>
+                Nome de fonte instalada
+                <input
+                  id="secondaryCustomFontName"
+                  type="text"
+                  placeholder="Ex: Montserrat, Gotham, MinhaFonte"
+                />
+              </label>
+
+              <label>
+                Arquivo de fonte personalizado
+                <input
+                  id="secondaryFontFile"
+                  type="file"
+                  accept=".ttf,.otf,.woff,.woff2"
+                />
+              </label>
+
+              <label>
+                Cor
+                <input id="secondaryColor" type="color" value="#ffffff" />
+              </label>
+
+              <label>
+                Tamanho da fonte (px)
+                <input
+                  id="secondarySize"
+                  type="number"
+                  min="8"
+                  max="600"
+                  value="30"
+                />
+              </label>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>Plano de fundo</h3>
+            <div class="grid">
+              <label>
+                Cor do fundo
+                <div class="inline-options">
+                  <input id="bgColor" type="color" value="#000000" />
+                  <label class="check-inline">
+                    <input id="transparentBg" type="checkbox" />
+                    Transparente
+                  </label>
+                </div>
+              </label>
+
+              <label>
+                Arredondamento do fundo (px)
+                <input
+                  id="borderRadius"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value="0"
+                />
+              </label>
+
+              <label>
+                Espaçamento vertical (rem)
+                <input id="padY" type="number" min="0" step="0.1" value="1" />
+              </label>
+
+              <label>
+                Espaçamento horizontal (rem)
+                <input id="padX" type="number" min="0" step="0.1" value="1" />
+              </label>
+            </div>
+
+            <div class="inline-checks compact-row">
+              <label class="check-inline">
+                <input id="lockPadding" type="checkbox" />
+                Travar proporção do espaçamento
+              </label>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>Exportação</h3>
+            <div class="grid compact-grid">
+              <label>
+                Resolução de exportação
+                <select id="resolutionPreset">
+                  <option value="1920x1080" selected>
+                    Full HD - 1920 × 1080
+                  </option>
+                  <option value="1080x1080">Quadrado - 1080 × 1080</option>
+                  <option value="2048x2048">Alta - 2048 × 2048</option>
+                  <option value="3840x2160">4K - 3840 × 2160</option>
+                  <option value="custom">Personalizada</option>
+                </select>
+              </label>
+
+              <label>
+                Largura (px)
+                <input id="exportWidth" type="number" min="100" value="1920" />
+              </label>
+
+              <label>
+                Altura (px)
+                <input id="exportHeight" type="number" min="100" value="1080" />
+              </label>
+            </div>
+
+            <div class="inline-checks compact-row">
+              <label class="check-inline">
+                <input id="lockAspectRatio" type="checkbox" checked />
+                Travar proporção da resolução
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <div class="actions">
+          <button id="resetBtn" type="button" class="secondary">
+            Restaurar padrão
+          </button>
+        </div>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="preview-topbar">
+          <div class="panel-header preview-header">
+            <h2>Pré-visualização</h2>
+            <p>O fundo acompanha automaticamente o tamanho do conteúdo.</p>
+          </div>
+
+          <div class="export-compact">
+            <div class="export-inline-group">
+              <span>Formato</span>
+              <div class="radio-group compact-radio-group">
+                <label
+                  ><input
+                    type="radio"
+                    name="downloadFormat"
+                    value="png"
+                    checked
+                  />
+                  PNG</label
+                >
+                <label
+                  ><input type="radio" name="downloadFormat" value="svg" />
+                  SVG</label
+                >
+              </div>
+            </div>
+            <button id="downloadBtn" type="button">Baixar arquivo</button>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div id="logoViewport" class="logo-viewport">
+            <div id="logoScaler" class="logo-scaler">
+              <div id="logoStage" class="logo-stage">
+                <div id="logoCard" class="logo-card">
+                  <h1 id="logoMain">DIPEDRA</h1>
+                  <p id="logoSecondary">Rochas Ornamentais</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      By Ralph Cajazeira -
+      <a
+        href="https://github.com/RalphCajazeira"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        https://github.com/RalphCajazeira
+      </a>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
