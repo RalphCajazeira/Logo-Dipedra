@@ -58,8 +58,6 @@ const els = {
 const fontState = {
   mainUpload: null,
   secondaryUpload: null,
-  mainPreset: null,
-  secondaryPreset: null,
   aspectRatio: defaults.exportWidth / defaults.exportHeight,
 }
 
@@ -79,28 +77,6 @@ async function fileToDataUrl(file) {
     reader.onerror = reject
     reader.readAsDataURL(file)
   })
-}
-
-async function pathToDataUrl(path) {
-  const response = await fetch(path)
-  const blob = await response.blob()
-  return await fileToDataUrl(blob)
-}
-
-function escapeXml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;")
-}
-
-function toCssFontFamily(value) {
-  if (!value) return "Arial, sans-serif"
-  return value.includes(",") || value.includes('"') || value.includes("'")
-    ? value
-    : `'${value}'`
 }
 
 function getMainFontChoice() {
@@ -128,7 +104,6 @@ function fitPreview() {
 
   const viewportWidth = viewport.clientWidth
   const viewportHeight = viewport.clientHeight
-
   const artWidth = art.scrollWidth
   const artHeight = art.scrollHeight
 
@@ -146,6 +121,29 @@ function fitPreview() {
 
   scaler.style.transform = `scale(${scale})`
   scaler.style.transformOrigin = "center center"
+}
+
+function updatePreview() {
+  els.logoMain.textContent = els.mainText.value || " "
+  els.logoSecondary.textContent = els.secondaryText.value || " "
+  els.logoMain.style.fontFamily = getMainFontChoice()
+  els.logoSecondary.style.fontFamily = getSecondaryFontChoice()
+  els.logoMain.style.color = els.mainColor.value
+  els.logoSecondary.style.color = els.secondaryColor.value
+  els.logoMain.style.fontSize = `${Number(els.mainSize.value || 0)}px`
+  els.logoSecondary.style.fontSize = `${Number(els.secondarySize.value || 0)}px`
+  els.logoCard.style.paddingTop = `${Number(els.padY.value || 0)}rem`
+  els.logoCard.style.paddingBottom = `${Number(els.padY.value || 0)}rem`
+  els.logoCard.style.paddingLeft = `${Number(els.padX.value || 0)}rem`
+  els.logoCard.style.paddingRight = `${Number(els.padX.value || 0)}rem`
+  els.logoCard.style.background = els.transparentBg.checked
+    ? "transparent"
+    : els.bgColor.value
+  els.logoCard.style.borderRadius = `${Number(els.borderRadius.value || 0)}px`
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(fitPreview)
+  })
 }
 
 function setDefaults() {
@@ -174,9 +172,11 @@ function setDefaults() {
   fontState.mainUpload = null
   fontState.secondaryUpload = null
   fontState.aspectRatio = defaults.exportWidth / defaults.exportHeight
+
   document.querySelector(
     `input[name="downloadFormat"][value="${defaults.downloadFormat}"]`,
   ).checked = true
+
   updatePreview()
 }
 
@@ -191,29 +191,6 @@ function updateResolutionFromPreset() {
   els.exportWidth.value = w
   els.exportHeight.value = h
   fontState.aspectRatio = w / h
-}
-
-function updatePreview() {
-  els.logoMain.textContent = els.mainText.value || " "
-  els.logoSecondary.textContent = els.secondaryText.value || " "
-  els.logoMain.style.fontFamily = getMainFontChoice()
-  els.logoSecondary.style.fontFamily = getSecondaryFontChoice()
-  els.logoMain.style.color = els.mainColor.value
-  els.logoSecondary.style.color = els.secondaryColor.value
-  els.logoMain.style.fontSize = `${Number(els.mainSize.value || 0)}px`
-  els.logoSecondary.style.fontSize = `${Number(els.secondarySize.value || 0)}px`
-  els.logoCard.style.paddingTop = `${Number(els.padY.value || 0)}rem`
-  els.logoCard.style.paddingBottom = `${Number(els.padY.value || 0)}rem`
-  els.logoCard.style.paddingLeft = `${Number(els.padX.value || 0)}rem`
-  els.logoCard.style.paddingRight = `${Number(els.padX.value || 0)}rem`
-  els.logoCard.style.background = els.transparentBg.checked
-    ? "transparent"
-    : els.bgColor.value
-  els.logoCard.style.borderRadius = `${Number(els.borderRadius.value || 0)}px`
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(fitPreview)
-  })
 }
 
 async function handleFontUpload(file, slot) {
@@ -250,168 +227,132 @@ async function handleFontUpload(file, slot) {
   }) || updatePreview()
 }
 
-async function ensurePresetFontData() {
-  if (!fontState.mainPreset) {
-    fontState.mainPreset = {
-      family: "stopregular",
-      dataUrl: await pathToDataUrl("./fonts/stopregular.otf"),
-      format: "opentype",
-    }
+function cloneForExport() {
+  const clone = els.logoCard.cloneNode(true)
+
+  const computedCard = getComputedStyle(els.logoCard)
+  const computedMain = getComputedStyle(els.logoMain)
+  const computedSecondary = getComputedStyle(els.logoSecondary)
+
+  clone.style.margin = "0"
+  clone.style.transform = "none"
+  clone.style.maxWidth = "none"
+  clone.style.maxHeight = "none"
+  clone.style.overflow = "visible"
+  clone.style.boxSizing = "border-box"
+  clone.style.display = "inline-flex"
+  clone.style.flexDirection = "column"
+  clone.style.alignItems = "center"
+  clone.style.justifyContent = "center"
+  clone.style.paddingTop = computedCard.paddingTop
+  clone.style.paddingBottom = computedCard.paddingBottom
+  clone.style.paddingLeft = computedCard.paddingLeft
+  clone.style.paddingRight = computedCard.paddingRight
+  clone.style.background = computedCard.backgroundColor
+  clone.style.borderRadius = computedCard.borderRadius
+
+  const cloneMain = clone.querySelector("#logoMain")
+  const cloneSecondary = clone.querySelector("#logoSecondary")
+
+  cloneMain.style.fontFamily = computedMain.fontFamily
+  cloneMain.style.fontSize = computedMain.fontSize
+  cloneMain.style.lineHeight = computedMain.lineHeight
+  cloneMain.style.color = computedMain.color
+  cloneMain.style.margin = computedMain.margin
+  cloneMain.style.whiteSpace = "nowrap"
+
+  cloneSecondary.style.fontFamily = computedSecondary.fontFamily
+  cloneSecondary.style.fontSize = computedSecondary.fontSize
+  cloneSecondary.style.lineHeight = computedSecondary.lineHeight
+  cloneSecondary.style.color = computedSecondary.color
+  cloneSecondary.style.margin = computedSecondary.margin
+  cloneSecondary.style.whiteSpace = "nowrap"
+
+  const sandbox = document.createElement("div")
+  sandbox.style.position = "fixed"
+  sandbox.style.left = "-100000px"
+  sandbox.style.top = "0"
+  sandbox.style.padding = "0"
+  sandbox.style.margin = "0"
+  sandbox.style.background = "transparent"
+  sandbox.style.zIndex = "-1"
+  sandbox.style.overflow = "visible"
+  sandbox.appendChild(clone)
+  document.body.appendChild(sandbox)
+
+  return { sandbox, clone }
+}
+
+function getNaturalExportSize(node) {
+  const width = Math.ceil(node.scrollWidth)
+  const height = Math.ceil(node.scrollHeight)
+  return { width, height }
+}
+
+function getTargetExportSize(naturalWidth, naturalHeight) {
+  const maxWidth = Number(els.exportWidth.value || defaults.exportWidth)
+  const maxHeight = Number(els.exportHeight.value || defaults.exportHeight)
+
+  if (!naturalWidth || !naturalHeight) {
+    return { width: maxWidth, height: maxHeight }
   }
 
-  if (!fontState.secondaryPreset) {
-    fontState.secondaryPreset = {
-      family: "BeckerGothics-Stencil",
-      dataUrl: await pathToDataUrl("./fonts/BeckerGothics-Stencil.ttf"),
-      format: "truetype",
-    }
+  const scale = Math.min(maxWidth / naturalWidth, maxHeight / naturalHeight)
+
+  return {
+    width: Math.max(1, Math.round(naturalWidth * scale)),
+    height: Math.max(1, Math.round(naturalHeight * scale)),
   }
 }
 
-async function buildSVG() {
-  await ensurePresetFontData()
-
-  const rect = els.logoCard.getBoundingClientRect()
-  const width = Math.ceil(rect.width)
-  const height = Math.ceil(rect.height)
-  const mainStyle = getComputedStyle(els.logoMain)
-  const secondaryStyle = getComputedStyle(els.logoSecondary)
-  const cardStyle = getComputedStyle(els.logoCard)
-
-  const mainCenterX = width / 2
-  const topPad = parseFloat(cardStyle.paddingTop)
-  const mainFontSize = parseFloat(mainStyle.fontSize)
-  const secondaryFontSize = parseFloat(secondaryStyle.fontSize)
-  const mainLineHeight = parseFloat(mainStyle.lineHeight) || mainFontSize * 0.85
-  const secondaryMarginTop = parseFloat(secondaryStyle.marginTop) || 0
-
-  const mainY = topPad + mainFontSize * 0.82
-  const secondaryY =
-    topPad + mainLineHeight + secondaryMarginTop + secondaryFontSize * 0.84
-
-  const bgRect = els.transparentBg.checked
-    ? ""
-    : `<rect x="0" y="0" width="${width}" height="${height}" rx="${Number(els.borderRadius.value || 0)}" ry="${Number(els.borderRadius.value || 0)}" fill="${escapeXml(els.bgColor.value)}" />`
-
-  const fontFaceRules = []
-  const embedded = new Map()
-  const maybeAddFontFace = (fontInfo) => {
-    if (
-      !fontInfo?.family ||
-      !fontInfo?.dataUrl ||
-      embedded.has(fontInfo.family)
-    )
-      return
-    embedded.set(fontInfo.family, true)
-    fontFaceRules.push(`
-      @font-face {
-        font-family: '${fontInfo.family}';
-        src: url('${fontInfo.dataUrl}') format('${fontInfo.format || "truetype"}');
-        font-weight: normal;
-        font-style: normal;
-      }
-    `)
-  }
-
-  if (getMainFontChoice() === "stopregular")
-    maybeAddFontFace(fontState.mainPreset)
-  if (getMainFontChoice() === "BeckerGothics-Stencil")
-    maybeAddFontFace(fontState.secondaryPreset)
-  if (getSecondaryFontChoice() === "stopregular")
-    maybeAddFontFace(fontState.mainPreset)
-  if (getSecondaryFontChoice() === "BeckerGothics-Stencil")
-    maybeAddFontFace(fontState.secondaryPreset)
-  maybeAddFontFace(fontState.mainUpload)
-  maybeAddFontFace(fontState.secondaryUpload)
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <style>
-      ${fontFaceRules.join("\n")}
-      .main {
-        font-family: ${toCssFontFamily(getMainFontChoice())};
-        font-size: ${mainFontSize}px;
-        fill: ${els.mainColor.value};
-      }
-      .secondary {
-        font-family: ${toCssFontFamily(getSecondaryFontChoice())};
-        font-size: ${secondaryFontSize}px;
-        fill: ${els.secondaryColor.value};
-      }
-    </style>
-  </defs>
-  ${bgRect}
-  <text x="${mainCenterX}" y="${mainY}" text-anchor="middle" class="main">${escapeXml(els.mainText.value || " ")}</text>
-  <text x="${mainCenterX}" y="${secondaryY}" text-anchor="middle" class="secondary">${escapeXml(els.secondaryText.value || " ")}</text>
-</svg>`
-}
-
-function downloadBlob(blob, fileName) {
-  const url = URL.createObjectURL(blob)
+function downloadDataUrl(dataUrl, fileName) {
   const a = document.createElement("a")
-  a.href = url
+  a.href = dataUrl
   a.download = fileName
   a.click()
-  URL.revokeObjectURL(url)
 }
 
-async function downloadSVG() {
-  const svgText = await buildSVG()
-  downloadBlob(
-    new Blob([svgText], { type: "image/svg+xml;charset=utf-8" }),
-    "logo.svg",
-  )
-}
+async function exportNodeAs(format) {
+  const { sandbox, clone } = cloneForExport()
 
-async function downloadPNG() {
-  const svgText = await buildSVG()
-  const width = Number(els.exportWidth.value || defaults.exportWidth)
-  const height = Number(els.exportHeight.value || defaults.exportHeight)
-  const img = new Image()
-  const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" })
-  const url = URL.createObjectURL(svgBlob)
+  try {
+    await document.fonts.ready
 
-  await new Promise((resolve, reject) => {
-    img.onload = resolve
-    img.onerror = reject
-    img.src = url
-  })
+    const natural = getNaturalExportSize(clone)
+    const target = getTargetExportSize(natural.width, natural.height)
 
-  const canvas = document.createElement("canvas")
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext("2d")
+    const scale = target.width / natural.width
 
-  if (!els.transparentBg.checked) {
-    ctx.fillStyle = els.bgColor.value
-    ctx.fillRect(0, 0, width, height)
+    const options = {
+      width: target.width,
+      height: target.height,
+      bgcolor: els.transparentBg.checked ? "transparent" : els.bgColor.value,
+      style: {
+        margin: "0",
+        transform: `scale(${scale})`,
+        transformOrigin: "top left",
+        width: `${natural.width}px`,
+        height: `${natural.height}px`,
+        overflow: "visible",
+      },
+    }
+
+    if (format === "svg") {
+      const dataUrl = await domtoimage.toSvg(clone, options)
+      downloadDataUrl(dataUrl, "logo.svg")
+      return
+    }
+
+    const dataUrl = await domtoimage.toPng(clone, options)
+    downloadDataUrl(dataUrl, "logo.png")
+  } finally {
+    sandbox.remove()
   }
-
-  const sourceWidth = img.width
-  const sourceHeight = img.height
-  const scale = Math.min(width / sourceWidth, height / sourceHeight)
-  const drawWidth = sourceWidth * scale
-  const drawHeight = sourceHeight * scale
-  const x = (width - drawWidth) / 2
-  const y = (height - drawHeight) / 2
-  ctx.drawImage(img, x, y, drawWidth, drawHeight)
-
-  URL.revokeObjectURL(url)
-
-  canvas.toBlob((blob) => {
-    if (!blob) return
-    downloadBlob(blob, "logo.png")
-  }, "image/png")
 }
 
 async function handleDownload() {
   const format = getFormat()
-  if (format === "svg") {
-    await downloadSVG()
-    return
-  }
-  await downloadPNG()
+  await exportNodeAs(format)
 }
 
 function syncPadding(source) {

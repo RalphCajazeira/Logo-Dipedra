@@ -82,7 +82,7 @@ body {
   min-height: 0;
   height: 100%;
   overflow-y: auto;
-  padding-bottom: 90px; /* evita corte por causa do footer */
+  padding-bottom: 90px;
 }
 
 .controls-sections {
@@ -287,7 +287,7 @@ button.secondary {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 24px; /* margem de segurança */
+  padding: 24px;
 }
 
 .logo-scaler {
@@ -314,6 +314,7 @@ button.secondary {
   background: #000000;
   border-radius: 0;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .logo-card h1 {
@@ -323,6 +324,7 @@ button.secondary {
   line-height: 0.85;
   margin: 0;
   white-space: nowrap;
+  overflow: visible;
 }
 
 .logo-card p {
@@ -332,6 +334,7 @@ button.secondary {
   line-height: 1;
   margin-top: 0.25rem;
   white-space: nowrap;
+  overflow: visible;
 }
 
 .footer {
