@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>QR Code Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #f1f5f9;
+        margin: 0;
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+
+      input {
+        width: 100%;
+        max-width: 500px;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .primary {
+        background: #22c55e;
+        color: #000;
+      }
+
+      .secondary {
+        background: #334155;
+        color: #fff;
+      }
+
+      canvas {
+        margin-top: 20px;
+        background: #fff;
+        padding: 10px;
+        border-radius: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gerador de QR Code</h1>
+
+    <input id="link" type="text" placeholder="Cole seu link aqui..." />
+
+    <br />
+
+    <button class="primary" onclick="gerarQR()">Gerar QR Code</button>
+    <button class="secondary" onclick="baixarPNG()">Baixar PNG</button>
+
+    <br />
+
+    <canvas id="qrcode"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <script>
+      let canvas = document.getElementById("qrcode")
+
+      function gerarQR() {
+        const link = document.getElementById("link").value
+
+        if (!link) {
+          alert("Digite um link!")
+          return
+        }
+
+        QRCode.toCanvas(
+          canvas,
+          link,
+          {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: "#000000",
+              light: "#ffffff",
+            },
+          },
+          function (error) {
+            if (error) console.error(error)
+          },
+        )
+      }
+
+      function baixarPNG() {
+        const link = document.createElement("a")
+        link.download = "qrcode.png"
+        link.href = canvas.toDataURL()
+        link.click()
+      }
+    </script>
+  </body>
+</html>
